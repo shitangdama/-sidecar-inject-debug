@@ -86,15 +86,17 @@ sidecar-injector-webhook-deployment-76ddb9f7f6-72pp8   1/1     Running       0  
 
 ```
 kubectl create -f example/sidecar.yml
-```
+
 
 NAME                                                   READY   STATUS    RESTARTS   AGE
 nginx-deployment-66fb44b8fd-jr64b                      2/2     Running   0          49s
 sidecar-injector-webhook-deployment-76ddb9f7f6-72pp8   1/1     Running   0          78s
+```
 
+get debuger crd
 ```
 kubectl get debugers
-```
 
 NAME              AGE
 test-sidecarset   18m
+```
