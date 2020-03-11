@@ -1,0 +1,36 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: debuger-system
+# ---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: debugers.shitangdama.github.io
+  # namespace: debuger-system
+spec:
+  group: shitangdama.github.io
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                containers:
+                  description: 'containers contains two pieces of information:
+                    1. normal container info that should be injected into pod
+                    2. custom fields to control insert behavior(currently empty)'
+                  items:
+                    type: object
+                  type: array
+  scope: Cluster
+  names:
+    plural: debugers
+    kind: Debuger

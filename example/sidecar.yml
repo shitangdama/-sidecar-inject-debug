@@ -1,0 +1,8 @@
+apiVersion: shitangdama.github.io/v1
+kind: Debuger
+metadata:
+  name: test-sidecarset
+spec:
+  containers:
+    - name: nginx-deployment
+      namespace: default
