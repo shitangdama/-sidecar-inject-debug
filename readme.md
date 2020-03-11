@@ -100,3 +100,12 @@ kubectl get debugers
 NAME              AGE
 test-sidecarset   18m
 ```
+
+4. Share volumeMounts
+
+```
+kubectl exec -it nginx-deployment-66fb44b8fd-jr64b -c nginx sh
+# cd /usr/share/nginx/html
+# ls
+index.html
+```

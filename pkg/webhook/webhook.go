@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -72,12 +71,9 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad item", http.StatusBadRequest)
 	}
 
-	fmt.Println(string(body))
 	string_data := string(byte_data)
 	string_data = strings.Replace(string_data, "\\n", "", -1)
 	string_data = strings.Replace(string_data, "\\", "", -1)
-	fmt.Println(string(byte_data))
-	fmt.Println(string_data)
 
 	var item item
 	if err := json.Unmarshal([]byte(string_data), &item); err != nil {
@@ -85,37 +81,38 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad item", http.StatusBadRequest)
 	}
 
-	fmt.Println(string_data)
-	fmt.Println(item)
-	fmt.Println(item.Spec.Containers)
-
 	var names []map[string]string
 	for _, data := range item.Spec.Containers {
 		names = append(names, data)
 	}
 
-	fmt.Println(111111111111)
 	err = whsvr.PatchSideCar(names)
 	if err != nil {
-		fmt.Println("出错了")
+		glog.Error("patch error")
 	}
-
 }
 
 func (whsvr *WebhookServer) PatchSideCar(names []map[string]string) error {
 	var err error
 	var namespace string
-	payload := []PatchStringValue{{
-		Op:   "add",
-		Path: "/spec/template/spec/containers/-",
-		Value: v1.Container{
-			Name:  "sidecar",
-			Image: "theiaide/theia",
+	payload := []PatchStringValue{
+		{
+			Op:   "add",
+			Path: "/spec/template/spec/containers/-",
+			Value: v1.Container{
+				Name:  "sidecar",
+				Image: "theiaide/theia",
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name:      "shared-data",
+						MountPath: "/pod-data",
+					},
+				},
+				Command: []string{"/bin/sh"},
+				Args:    []string{"-c", "echo Hello from the debian container > /pod-data/index.html"},
+			},
 		},
-	}}
-
-	fmt.Println(len(names))
-	fmt.Println(222222222222222)
+	}
 
 	payloadBytes, err := json.Marshal(payload)
 
@@ -126,10 +123,6 @@ func (whsvr *WebhookServer) PatchSideCar(names []map[string]string) error {
 			namespace = "defalut"
 		}
 
-		fmt.Println(namespace)
-
-		fmt.Println(data["name"])
-		fmt.Println(333333333333)
 		if _, err = whsvr.Clientset.AppsV1().Deployments(namespace).Get(data["name"], meta_v1.GetOptions{}); err != nil {
 			return err
 		} else {

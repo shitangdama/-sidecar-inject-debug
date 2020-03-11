@@ -17,3 +17,9 @@ spec:
         image: nginx:1.7.9
         ports:
         - containerPort: 80
+        volumeMounts:
+          - name: shared-data
+            mountPath: /usr/share/nginx/html
+      volumes:
+        - name: shared-data
+          emptyDir: {}
